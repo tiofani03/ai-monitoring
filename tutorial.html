@@ -1,0 +1,1784 @@
+clau<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Monitoring — Setup Tutorial</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0F1115;
+      --surface:   #1A1D23;
+      --card:      #1E2028;
+      --border:    #2A2D35;
+      --text:      #E2E8F0;
+      --muted:     #8892A4;
+      --orange:    #F97316;
+      --cyan:      #06B6D4;
+      --green:     #22C55E;
+      --yellow:    #EAB308;
+      --red:       #EF4444;
+      --purple:    #A855F7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── LAYOUT ─── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--orange), #FB923C);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .brand-name { font-weight: 700; font-size: 15px; color: var(--text); }
+    .brand-sub  { font-size: 11px; color: var(--muted); }
+
+    .sidebar-section { padding: 0 12px 8px; }
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 0 8px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13.5px;
+      transition: all 0.15s;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--card); color: var(--text); }
+    .nav-item.active { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--orange);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .nav-badge.green { background: var(--green); }
+    .nav-badge.cyan  { background: var(--cyan); }
+
+    /* ─── MAIN ─── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 48px;
+      max-width: 900px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      margin-bottom: 48px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.3);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .hero h1 {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 640px;
+    }
+
+    /* ─── ARCHITECTURE DIAGRAM ─── */
+    .arch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 40px;
+    }
+    .arch-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 20px;
+    }
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .arch-node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 130px;
+    }
+    .arch-node .node-icon { font-size: 22px; margin-bottom: 6px; }
+    .arch-node .node-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .arch-node .node-port { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .arch-node.admin .node-name { color: var(--orange); }
+    .arch-node.client .node-name { color: var(--cyan); }
+    .arch-node.db .node-name { color: var(--green); }
+    .arch-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--muted);
+    }
+    .arch-arrow .arrow-line {
+      width: 50px;
+      height: 1px;
+      background: var(--border);
+      position: relative;
+    }
+    .arch-arrow .arrow-line::after {
+      content: '▶';
+      position: absolute;
+      right: -8px;
+      top: -7px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .arch-arrow .arrow-label { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* ─── ROLE TABS ─── */
+    .role-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .role-tab {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      cursor: default;
+      transition: all 0.15s;
+    }
+    .role-tab.admin  { border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.06); }
+    .role-tab.client { border-color: rgba(6,182,212,0.4);  background: rgba(6,182,212,0.06);  }
+    .role-tab-icon { font-size: 20px; margin-bottom: 6px; }
+    .role-tab-title { font-size: 15px; font-weight: 700; }
+    .role-tab.admin  .role-tab-title { color: var(--orange); }
+    .role-tab.client .role-tab-title { color: var(--cyan); }
+    .role-tab-desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ─── SECTION ─── */
+    .section { margin-bottom: 52px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-badge {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .section-badge.orange { background: rgba(249,115,22,0.15); }
+    .section-badge.cyan   { background: rgba(6,182,212,0.15); }
+    .section-badge.green  { background: rgba(34,197,94,0.15); }
+    .section-badge.purple { background: rgba(168,85,247,0.15); }
+
+    .section-header h2 { font-size: 21px; font-weight: 700; }
+    .section-header .section-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── STEP ─── */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step {
+      display: flex;
+      gap: 18px;
+    }
+    .step-number {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step.admin  .step-number { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); }
+    .step.client .step-number { border-color: var(--cyan);   color: var(--cyan);   background: rgba(6,182,212,0.08);  }
+    .step.green  .step-number { border-color: var(--green);  color: var(--green);  background: rgba(34,197,94,0.08);  }
+
+    .step-content { flex: 1; }
+    .step-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 10px; }
+
+    /* ─── CODE BLOCK ─── */
+    .code-block {
+      background: #0A0C10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 10px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .code-copy {
+      font-size: 11px;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .code-copy:hover { background: var(--border); color: var(--text); }
+    .code-body {
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .code-body pre { color: var(--text); white-space: pre; }
+
+    /* syntax */
+    .k { color: #C792EA; } /* keyword */
+    .s { color: #C3E88D; } /* string */
+    .c { color: #546E7A; font-style: italic; } /* comment */
+    .v { color: #FFCB6B; } /* variable */
+    .n { color: #82AAFF; } /* number/value */
+    .p { color: var(--muted); } /* punctuation */
+    .cmd { color: var(--cyan); } /* command */
+    .flag { color: var(--orange); } /* flag */
+    .path { color: var(--green); } /* path */
+    .dollar { color: var(--muted); user-select: none; }
+
+    /* ─── CALLOUT ─── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13.5px;
+    }
+    .callout.info    { background: rgba(6,182,212,0.08);  border: 1px solid rgba(6,182,212,0.2);  color: #67E8F9; }
+    .callout.warn    { background: rgba(234,179,8,0.08);  border: 1px solid rgba(234,179,8,0.2);  color: #FDE047; }
+    .callout.success { background: rgba(34,197,94,0.08);  border: 1px solid rgba(34,197,94,0.2);  color: #86EFAC; }
+    .callout.danger  { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.2);  color: #FCA5A5; }
+    .callout-icon { font-size: 16px; flex-shrink: 0; }
+    .callout-text { line-height: 1.6; }
+    .callout-text strong { font-weight: 600; }
+
+    /* ─── TABLE ─── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table code {
+      font-family: monospace;
+      background: var(--surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--cyan);
+    }
+
+    /* ─── CHECKLIST ─── */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+    .check-icon { color: var(--green); font-size: 14px; margin-top: 2px; flex-shrink: 0; }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+
+    /* ─── CREDENTIAL BOX ─── */
+    .cred-box {
+      background: #0A0C10;
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+    .cred-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cred-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .cred-row:last-child { border-bottom: none; }
+    .cred-key {
+      font-size: 12px;
+      color: var(--muted);
+      width: 130px;
+      flex-shrink: 0;
+      font-family: monospace;
+    }
+    .cred-value {
+      font-family: 'Cascadia Code', monospace;
+      font-size: 12.5px;
+      color: var(--green);
+      background: rgba(34,197,94,0.08);
+      padding: 3px 10px;
+      border-radius: 5px;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    /* ─── FLOW DIAGRAM ─── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 12px;
+    }
+    .flow-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .flow-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 32px;
+    }
+    .flow-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .flow-dot.orange { background: var(--orange); box-shadow: 0 0 8px rgba(249,115,22,0.5); }
+    .flow-dot.cyan   { background: var(--cyan);   box-shadow: 0 0 8px rgba(6,182,212,0.5); }
+    .flow-dot.green  { background: var(--green);  box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+    .flow-line {
+      width: 1px;
+      flex: 1;
+      min-height: 24px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+    .flow-text {
+      flex: 1;
+      padding-bottom: 20px;
+    }
+    .flow-text .ft-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .flow-text .ft-desc  { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ─── TAG ─── */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .tag.admin  { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .tag.client { background: rgba(6,182,212,0.15);  color: var(--cyan);   }
+
+    /* ─── FOOTER ─── */
+    .page-footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; min-width: 0; height: auto; position: relative; }
+      .main { padding: 24px 20px; }
+      .arch-diagram { flex-direction: column; }
+      .arch-arrow { transform: rotate(90deg); }
+      .role-tabs { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ───────────── SIDEBAR ───────────── -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">📊</div>
+      <div>
+        <div class="brand-name">AI Monitoring</div>
+        <div class="brand-sub">Setup Guide</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Overview</div>
+      <a class="nav-item active" href="#overview">
+        <span class="icon">🏠</span> Pengenalan Sistem
+      </a>
+      <a class="nav-item" href="#architecture">
+        <span class="icon">🗺️</span> Arsitektur
+      </a>
+      <a class="nav-item" href="#prerequisites">
+        <span class="icon">📦</span> Prasyarat
+        <span class="nav-badge green">2</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">🔶 Admin Setup</div>
+      <a class="nav-item" href="#admin-clone">
+        <span class="icon">⬇️</span> 1. Clone & Install
+      </a>
+      <a class="nav-item" href="#admin-env">
+        <span class="icon">⚙️</span> 2. Konfigurasi .env
+      </a>
+      <a class="nav-item" href="#admin-db">
+        <span class="icon">🗄️</span> 3. Setup Database
+      </a>
+      <a class="nav-item" href="#admin-run">
+        <span class="icon">▶️</span> 4. Jalankan Services
+      </a>
+      <a class="nav-item" href="#admin-register">
+        <span class="icon">🔑</span> 5. Daftarkan Client
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">🔵 Client Setup</div>
+      <a class="nav-item" href="#client-clone">
+        <span class="icon">⬇️</span> 1. Clone & Install
+      </a>
+      <a class="nav-item" href="#client-config">
+        <span class="icon">📝</span> 2. Config dari Admin
+      </a>
+      <a class="nav-item" href="#client-db">
+        <span class="icon">🗄️</span> 3. Setup Database Lokal
+      </a>
+      <a class="nav-item" href="#client-run">
+        <span class="icon">▶️</span> 4. Jalankan Agent
+      </a>
+      <a class="nav-item" href="#client-verify">
+        <span class="icon">✅</span> 5. Verifikasi Sync
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Referensi</div>
+      <a class="nav-item" href="#ports">
+        <span class="icon">🔌</span> Daftar Port
+      </a>
+      <a class="nav-item" href="#sync-modes">
+        <span class="icon">🔒</span> Sync Mode
+      </a>
+      <a class="nav-item" href="#troubleshoot">
+        <span class="icon">🛠️</span> Troubleshooting
+      </a>
+    </div>
+  </nav>
+
+  <!-- ───────────── MAIN ───────────── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero" id="overview">
+      <div class="hero-eyebrow">📘 Setup Guide v1.0</div>
+      <h1>AI Monitoring System<br/>Setup Tutorial</h1>
+      <p>Panduan lengkap untuk mengatur sistem monitoring penggunaan AI (Claude Code) — dari sisi <strong style="color:var(--orange)">Admin</strong> yang mengelola server sentral, hingga sisi <strong style="color:var(--cyan)">Client</strong> yang menginstal agent di komputer masing-masing.</p>
+    </div>
+
+    <!-- ROLE TABS -->
+    <div class="role-tabs">
+      <div class="role-tab admin">
+        <div class="role-tab-icon">🧑‍💼</div>
+        <div class="role-tab-title">Admin (Kamu)</div>
+        <div class="role-tab-desc">Mengelola server sentral, database PostgreSQL, admin dashboard, dan mendaftarkan device client.</div>
+      </div>
+      <div class="role-tab client">
+        <div class="role-tab-icon">💻</div>
+        <div class="role-tab-title">Client (Teman)</div>
+        <div class="role-tab-desc">Menginstal local-agent di komputernya untuk memantau penggunaan Claude dan sinkronisasi ke server admin.</div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="arch" id="architecture">
+      <div class="arch-title">🗺️ Arsitektur Sistem</div>
+      <div class="arch-diagram">
+        <div class="arch-node client">
+          <div class="node-icon">💻</div>
+          <div class="node-name">Local Agent</div>
+          <div class="node-port">:3002 — komputer client</div>
+        </div>
+        <div class="arch-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">HTTPS sync<br/>setiap 30 detik</div>
+        </div>
+        <div class="arch-node admin">
+          <div class="node-icon">🖥️</div>
+          <div class="node-name">Admin API</div>
+          <div class="node-port">:4000 — server admin</div>
+        </div>
+        <div class="arch-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">query</div>
+        </div>
+        <div class="arch-node db">
+          <div class="node-icon">🐘</div>
+          <div class="node-name">PostgreSQL</div>
+          <div class="node-port">:5433 — VPS</div>
+        </div>
+      </div>
+      <div style="margin-top:20px; display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
+          <span style="color:var(--cyan)">●</span> Local Agent — baca log Claude di <code style="font-family:monospace;font-size:11px;background:var(--surface);padding:1px 5px;border-radius:3px">~/.claude/projects/</code>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
+          <span style="color:var(--orange)">●</span> Admin API — terima sync, simpan ke PostgreSQL
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
+          <span style="color:var(--green)">●</span> Admin Dashboard — visualisasi dari semua client
+        </div>
+      </div>
+    </div>
+
+    <!-- PREREQUISITES -->
+    <div class="section" id="prerequisites">
+      <div class="section-header">
+        <div class="section-badge green">📦</div>
+        <div>
+          <h2>Prasyarat</h2>
+          <div class="section-sub">Software yang harus sudah terinstal sebelum memulai</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Kedua pihak (Admin & Client) butuh:</div>
+        <ul class="checklist">
+          <li>
+            <span class="check-icon">✓</span>
+            <span><strong>Node.js v18+</strong> — cek dengan <code style="font-family:monospace;background:var(--surface);padding:1px 6px;border-radius:3px;font-size:12px">node --version</code></span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span><strong>pnpm</strong> — install dengan <code style="font-family:monospace;background:var(--surface);padding:1px 6px;border-radius:3px;font-size:12px">npm install -g pnpm</code></span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span><strong>Git</strong> — untuk clone repository</span>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <span><strong>Claude Code CLI</strong> — sudah terpasang dan pernah digunakan (menghasilkan log di <code style="font-family:monospace;background:var(--surface);padding:1px 6px;border-radius:3px;font-size:12px">~/.claude/projects/</code>)</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="callout info" style="margin-top:12px">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-text">
+          <strong>Khusus Admin:</strong> Butuh akses ke VPS/server PostgreSQL. Tutorial ini mengasumsikan database sudah ada dan bisa diakses via connection string.
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ═══════════════════════════════ ADMIN SECTION ═══════════════════════════════ -->
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <span style="background:var(--orange);color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em">BAGIAN 1</span>
+      <span style="font-size:18px;font-weight:700;color:var(--orange)">Setup Admin (Server Sentral)</span>
+    </div>
+
+    <!-- ADMIN STEP 1 -->
+    <div class="section" id="admin-clone">
+      <div class="section-header">
+        <div class="section-badge orange">⬇️</div>
+        <div>
+          <h2>1. Clone Repository & Install Dependencies</h2>
+          <div class="section-sub">Jalankan di server/komputer yang akan jadi server admin</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step admin">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Clone repository</div>
+            <div class="step-desc">Clone project ke folder pilihan kamu</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">git</span> clone https://github.com/tiofani03/ai-monitoring.git
+<span class="dollar">$ </span><span class="cmd">cd</span> ai-monitoring</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Install semua dependencies</div>
+            <div class="step-desc">Jalankan dari root folder — pnpm akan install semua workspace packages sekaligus</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">pnpm</span> install</pre></div>
+            </div>
+            <div class="callout warn" style="margin-top:8px">
+              <span class="callout-icon">⚠️</span>
+              <div class="callout-text">Jika muncul error <code style="font-family:monospace">Invalid package manager specification</code>, edit <code style="font-family:monospace">package.json</code> dan ubah <code style="font-family:monospace">"version": "^11.5.3"</code> menjadi <code style="font-family:monospace">"version": "11.5.3"</code> (hapus tanda <code style="font-family:monospace">^</code>).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN STEP 2 -->
+    <div class="section" id="admin-env">
+      <div class="section-header">
+        <div class="section-badge orange">⚙️</div>
+        <div>
+          <h2>2. Konfigurasi File .env</h2>
+          <div class="section-sub">Buat file environment untuk admin-api, admin-dashboard, dan db-admin</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step admin">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Admin API — <code style="font-family:monospace;font-size:13px">apps/admin-api/.env</code></div>
+            <div class="step-desc">Buat file <code style="font-family:monospace;font-size:12px">.env</code> di folder <code style="font-family:monospace;font-size:12px">apps/admin-api/</code></div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">cp</span> apps/admin-api/.env.example apps/admin-api/.env</pre></div>
+            </div>
+            <div class="code-block" style="margin-top:8px">
+              <div class="code-header">
+                <span class="code-lang">apps/admin-api/.env</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="v">PORT</span><span class="p">=</span><span class="n">4000</span>
+<span class="v">DATABASE_URL</span><span class="p">=</span><span class="s">postgresql://USER:PASSWORD@HOST:PORT/ai_monitoring</span></pre></div>
+            </div>
+            <div class="callout info" style="margin-top:8px">
+              <span class="callout-icon">ℹ️</span>
+              <div class="callout-text">Ganti <code style="font-family:monospace">USER:PASSWORD@HOST:PORT</code> dengan credential PostgreSQL VPS kamu. Database harus bernama <code style="font-family:monospace">ai_monitoring</code>.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Admin Dashboard — <code style="font-family:monospace;font-size:13px">apps/admin-dashboard/.env</code></div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">apps/admin-dashboard/.env</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="v">DATABASE_URL</span><span class="p">=</span><span class="s">postgresql://USER:PASSWORD@HOST:PORT/ai_monitoring</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">DB Admin Package — <code style="font-family:monospace;font-size:13px">packages/db-admin/.env</code></div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">packages/db-admin/.env</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="v">DATABASE_URL</span><span class="p">=</span><span class="s">postgresql://USER:PASSWORD@HOST:PORT/ai_monitoring</span></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN STEP 3 -->
+    <div class="section" id="admin-db">
+      <div class="section-header">
+        <div class="section-badge orange">🗄️</div>
+        <div>
+          <h2>3. Setup Database PostgreSQL</h2>
+          <div class="section-sub">Buat database dan jalankan migrasi schema</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step admin">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Buat database <code style="font-family:monospace;font-size:13px">ai_monitoring</code></div>
+            <div class="step-desc">Jika database belum ada, buat dulu. Jalankan dari root folder project:</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash — via psql</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="c"># Jika psql tersedia:</span>
+<span class="dollar">$ </span>PGPASSWORD=<span class="s">PASSWORD</span> <span class="cmd">psql</span> <span class="flag">-h</span> HOST <span class="flag">-p</span> PORT <span class="flag">-U</span> USER <span class="flag">-d</span> postgres <span class="flag">-c</span> <span class="s">"CREATE DATABASE ai_monitoring;"</span></pre></div>
+            </div>
+            <div class="code-block" style="margin-top:8px">
+              <div class="code-header">
+                <span class="code-lang">bash — via Node.js (jika psql tidak ada)</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">node</span> <span class="flag">--input-type=module</span> <span class="s">&lt;&lt;'EOF'</span>
+<span class="k">import</span> postgres <span class="k">from</span> <span class="s">'./node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js'</span><span class="p">;</span>
+<span class="k">const</span> sql <span class="p">=</span> postgres(<span class="s">'postgresql://USER:PASSWORD@HOST:PORT/postgres'</span>)<span class="p">;</span>
+<span class="k">await</span> sql<span class="p">`</span><span class="s">CREATE DATABASE ai_monitoring</span><span class="p">`;</span>
+<span class="k">await</span> sql.end()<span class="p">;</span>
+<span class="s">EOF</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Push schema ke database</div>
+            <div class="step-desc">Drizzle ORM akan membuat semua tabel yang dibutuhkan</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">cd</span> packages/db-admin
+<span class="dollar">$ </span><span class="cmd">pnpm</span> exec drizzle-kit push</pre></div>
+            </div>
+            <div class="callout success" style="margin-top:8px">
+              <span class="callout-icon">✅</span>
+              <div class="callout-text">Output yang benar: <strong>[✓] Changes applied</strong> — artinya tabel berhasil dibuat di PostgreSQL.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Tabel yang dibuat di PostgreSQL</div>
+            <table class="data-table" style="margin-top:8px">
+              <thead>
+                <tr>
+                  <th>Tabel</th>
+                  <th>Fungsi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>devices</code></td><td>Daftar device/komputer client yang terdaftar</td></tr>
+                <tr><td><code>events</code></td><td>Log penggunaan AI dari semua client</td></tr>
+                <tr><td><code>sync_logs</code></td><td>Riwayat sinkronisasi data</td></tr>
+                <tr><td><code>projects</code></td><td>Proyek yang dipantau</td></tr>
+                <tr><td><code>sessions</code></td><td>Sesi Claude per proyek</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN STEP 4 -->
+    <div class="section" id="admin-run">
+      <div class="section-header">
+        <div class="section-badge orange">▶️</div>
+        <div>
+          <h2>4. Jalankan Services Admin</h2>
+          <div class="section-sub">Jalankan admin-api dan admin-dashboard</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step admin">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Jalankan Admin API (Terminal 1)</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">cd</span> apps/admin-api
+<span class="dollar">$ </span><span class="cmd">pnpm</span> run dev</pre></div>
+            </div>
+            <div class="callout success" style="margin-top:8px">
+              <span class="callout-icon">✅</span>
+              <div class="callout-text">Output: <strong>Admin API running on http://localhost:4000</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Jalankan Admin Dashboard (Terminal 2)</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">cd</span> apps/admin-dashboard
+<span class="dollar">$ </span><span class="cmd">pnpm</span> run dev</pre></div>
+            </div>
+            <div class="callout success" style="margin-top:8px">
+              <span class="callout-icon">✅</span>
+              <div class="callout-text">Output: <strong>✓ Ready in ~250ms — http://localhost:3000</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Untuk production — pakai PM2 agar berjalan terus</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">npm</span> install <span class="flag">-g</span> pm2
+
+<span class="c"># Dari root folder project:</span>
+<span class="dollar">$ </span><span class="cmd">pm2</span> start pnpm <span class="flag">--name</span> <span class="s">"admin-api"</span> <span class="flag">--cwd</span> <span class="path">apps/admin-api</span> <span class="flag">--</span> run dev
+<span class="dollar">$ </span><span class="cmd">pm2</span> start pnpm <span class="flag">--name</span> <span class="s">"admin-dashboard"</span> <span class="flag">--cwd</span> <span class="path">apps/admin-dashboard</span> <span class="flag">--</span> run dev
+<span class="dollar">$ </span><span class="cmd">pm2</span> save
+<span class="dollar">$ </span><span class="cmd">pm2</span> startup  <span class="c"># agar auto-start saat reboot</span></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN STEP 5 — REGISTER CLIENT -->
+    <div class="section" id="admin-register">
+      <div class="section-header">
+        <div class="section-badge orange">🔑</div>
+        <div>
+          <h2>5. Daftarkan Client Baru</h2>
+          <div class="section-sub">Langkah ini WAJIB dilakukan admin sebelum client bisa sync data</div>
+        </div>
+      </div>
+
+      <div class="callout warn" style="margin-bottom:16px">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-text">
+          <strong>Penting:</strong> Sistem ini tidak punya self-registration. Admin harus manual mendaftarkan setiap device client ke database, lalu memberikan <strong>Device ID</strong> dan <strong>API Key</strong> ke client.
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step admin">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Generate Device ID dan API Key untuk client</div>
+            <div class="step-desc">Buat dua UUID unik — satu untuk device_id, satu untuk api_key</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="c"># Generate di Linux/Mac:</span>
+<span class="dollar">$ </span><span class="cmd">cat</span> /proc/sys/kernel/random/uuid  <span class="c"># → device_id</span>
+<span class="dollar">$ </span><span class="cmd">cat</span> /proc/sys/kernel/random/uuid  <span class="c"># → api_key</span>
+
+<span class="c"># Atau pakai Node.js:</span>
+<span class="dollar">$ </span><span class="cmd">node</span> <span class="flag">-e</span> <span class="s">"console.log(crypto.randomUUID())"</span>  <span class="c"># jalankan 2x</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Daftarkan device ke database PostgreSQL</div>
+            <div class="step-desc">Simpan script ini lalu jalankan dari root folder project. Ganti nilai sesuai data client.</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash — register-client.mjs</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="c">// Simpan sebagai register-client.mjs lalu jalankan: node register-client.mjs</span>
+
+<span class="k">import</span> postgres <span class="k">from</span> <span class="s">'./node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js'</span><span class="p">;</span>
+
+<span class="k">const</span> DB_URL  <span class="p">=</span> <span class="s">'postgresql://USER:PASSWORD@HOST:PORT/ai_monitoring'</span><span class="p">;</span>
+<span class="k">const</span> DEVICE  <span class="p">=</span> <span class="p">{</span>
+  <span class="v">device_id</span>  <span class="p">:</span> <span class="s">'UUID-DEVICE-ID-DARI-LANGKAH-1'</span><span class="p">,</span>   <span class="c">// ganti ini</span>
+  <span class="v">api_key</span>    <span class="p">:</span> <span class="s">'UUID-API-KEY-DARI-LANGKAH-1'</span><span class="p">,</span>     <span class="c">// ganti ini</span>
+  <span class="v">name</span>       <span class="p">:</span> <span class="s">'Laptop-Teman'</span><span class="p">,</span>                   <span class="c">// nama device</span>
+  <span class="v">hostname</span>   <span class="p">:</span> <span class="s">'LAPTOP-TEMAN'</span><span class="p">,</span>                   <span class="c">// hostname komputer client</span>
+  <span class="v">os</span>         <span class="p">:</span> <span class="s">'linux'</span><span class="p">,</span>                          <span class="c">// linux / win32 / darwin</span>
+  <span class="v">arch</span>       <span class="p">:</span> <span class="s">'x64'</span><span class="p">,</span>
+  <span class="v">version</span>    <span class="p">:</span> <span class="s">'1.0.0'</span>
+<span class="p">};</span>
+
+<span class="k">const</span> sql <span class="p">=</span> postgres(DB_URL)<span class="p">;</span>
+<span class="k">const</span> now <span class="p">=</span> <span class="k">new</span> Date().toISOString()<span class="p">;</span>
+
+<span class="k">await</span> sql<span class="p">`</span>
+  INSERT INTO devices (id, api_key_hash, name, hostname, os, arch, tracker_version, created_at, last_seen_at)
+  VALUES (<span class="p">${</span>DEVICE.device_id<span class="p">}</span>, <span class="p">${</span>DEVICE.api_key<span class="p">}</span>, <span class="p">${</span>DEVICE.name<span class="p">}</span>, <span class="p">${</span>DEVICE.hostname<span class="p">}</span>,
+          <span class="p">${</span>DEVICE.os<span class="p">}</span>, <span class="p">${</span>DEVICE.arch<span class="p">}</span>, <span class="p">${</span>DEVICE.version<span class="p">}</span>, <span class="p">${</span>now<span class="p">}</span>, <span class="p">${</span>now<span class="p">}</span>)
+  ON CONFLICT (id) DO NOTHING
+<span class="p">`;</span>
+
+<span class="k">await</span> sql.end()<span class="p">;</span>
+console.log(<span class="s">'✅ Device berhasil didaftarkan!'</span>)<span class="p">;</span>
+console.log(<span class="s">'Kirim ke client:'</span>)<span class="p">;</span>
+console.log(<span class="s">'  device_id :'</span><span class="p">,</span> DEVICE.device_id)<span class="p">;</span>
+console.log(<span class="s">'  api_key   :'</span><span class="p">,</span> DEVICE.api_key)<span class="p">;</span></pre></div>
+            </div>
+            <div class="code-block" style="margin-top:8px">
+              <div class="code-header">
+                <span class="code-lang">bash — jalankan script</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">node</span> register-client.mjs</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Kirim credential ke client</div>
+            <div class="step-desc">Setelah script berhasil, kirim 3 informasi ini ke teman kamu:</div>
+            <div class="cred-box">
+              <div class="cred-title">🔐 Credential untuk Client</div>
+              <div class="cred-row">
+                <div class="cred-key">device_id</div>
+                <div class="cred-value">UUID yang kamu generate di langkah 1</div>
+              </div>
+              <div class="cred-row">
+                <div class="cred-key">api_key</div>
+                <div class="cred-value">UUID yang kamu generate di langkah 1</div>
+              </div>
+              <div class="cred-row">
+                <div class="cred-key">sync_endpoint</div>
+                <div class="cred-value">http://&lt;IP-SERVER-ADMIN&gt;:4000</div>
+              </div>
+            </div>
+            <div class="callout warn" style="margin-top:10px">
+              <span class="callout-icon">⚠️</span>
+              <div class="callout-text">
+                <strong>Keamanan:</strong> Jangan share credential ini secara publik. Gunakan chat pribadi atau password manager. API key ini berfungsi seperti password.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step admin">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Verifikasi device terdaftar</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">node</span> <span class="flag">--input-type=module</span> <span class="s">&lt;&lt;'EOF'</span>
+<span class="k">import</span> postgres <span class="k">from</span> <span class="s">'./node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js'</span><span class="p">;</span>
+<span class="k">const</span> sql <span class="p">=</span> postgres(<span class="s">'postgresql://USER:PASSWORD@HOST:PORT/ai_monitoring'</span>)<span class="p">;</span>
+<span class="k">const</span> rows <span class="p">=</span> <span class="k">await</span> sql<span class="p">`</span>SELECT id, name, created_at FROM devices<span class="p">`;</span>
+console.log(rows)<span class="p">;</span>
+<span class="k">await</span> sql.end()<span class="p">;</span>
+<span class="s">EOF</span></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ═══════════════════════════════ CLIENT SECTION ═══════════════════════════════ -->
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <span style="background:var(--cyan);color:#0F1115;font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em">BAGIAN 2</span>
+      <span style="font-size:18px;font-weight:700;color:var(--cyan)">Setup Client (Komputer Teman)</span>
+    </div>
+
+    <div class="callout info" style="margin-bottom:28px">
+      <span class="callout-icon">📋</span>
+      <div class="callout-text">
+        <strong>Sebelum mulai:</strong> Pastikan kamu sudah menerima 3 data dari Admin: <code style="font-family:monospace">device_id</code>, <code style="font-family:monospace">api_key</code>, dan <code style="font-family:monospace">sync_endpoint</code> (URL server admin).
+      </div>
+    </div>
+
+    <!-- CLIENT STEP 1 -->
+    <div class="section" id="client-clone">
+      <div class="section-header">
+        <div class="section-badge cyan">⬇️</div>
+        <div>
+          <h2>1. Clone Repository & Install Dependencies</h2>
+          <div class="section-sub">Jalankan di komputer kamu (bukan server admin)</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step client">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Clone repository</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">git</span> clone https://github.com/tiofani03/ai-monitoring.git
+<span class="dollar">$ </span><span class="cmd">cd</span> ai-monitoring</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Install dependencies</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">pnpm</span> install</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT STEP 2 -->
+    <div class="section" id="client-config">
+      <div class="section-header">
+        <div class="section-badge cyan">📝</div>
+        <div>
+          <h2>2. Buat File Config dari Data Admin</h2>
+          <div class="section-sub">Gunakan device_id, api_key, dan sync_endpoint yang diberikan admin</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step client">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Buat folder <code style="font-family:monospace;font-size:13px">~/.ai-usage/</code></div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">mkdir</span> <span class="flag">-p</span> ~/.ai-usage</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Buat file <code style="font-family:monospace;font-size:13px">~/.ai-usage/config.json</code></div>
+            <div class="step-desc">Isi dengan credential dari admin. <strong>Jangan</strong> salin contoh mentah-mentah — ganti semua nilai di bawah ini.</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">~/.ai-usage/config.json</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="p">{</span>
+  <span class="s">"device_id"</span>     <span class="p">:</span> <span class="s">"UUID-DARI-ADMIN"</span><span class="p">,</span>          <span class="c">← ganti dengan device_id dari admin</span>
+  <span class="s">"device_name"</span>   <span class="p">:</span> <span class="s">"Nama-Laptop-Kamu"</span><span class="p">,</span>        <span class="c">← bebas, nama komputer kamu</span>
+  <span class="s">"sync_endpoint"</span> <span class="p">:</span> <span class="s">"http://IP-SERVER-ADMIN:4000"</span><span class="p">,</span> <span class="c">← URL admin-api dari admin</span>
+  <span class="s">"api_key"</span>       <span class="p">:</span> <span class="s">"UUID-API-KEY-DARI-ADMIN"</span><span class="p">,</span>  <span class="c">← api_key dari admin</span>
+  <span class="s">"sync_mode"</span>     <span class="p">:</span> <span class="s">"metadata_only"</span><span class="p">,</span>           <span class="c">← pilih mode (lihat tabel di bawah)</span>
+  <span class="s">"debug"</span>         <span class="p">:</span> <span class="n">false</span>
+<span class="p">}</span></pre></div>
+            </div>
+            <div class="card" style="margin-top:10px">
+              <div class="card-title">Pilihan <code style="font-family:monospace;font-size:12px">sync_mode</code></div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mode</th>
+                    <th>Data yang dikirim</th>
+                    <th>Rekomendasi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>metadata_only</code></td>
+                    <td>Token count, model, timestamp — tanpa isi chat</td>
+                    <td>✅ Default, aman privasi</td>
+                  </tr>
+                  <tr>
+                    <td><code>redacted_content</code></td>
+                    <td>Isi chat ter-sensor (fitur belum lengkap)</td>
+                    <td>⚠️ Dalam pengembangan</td>
+                  </tr>
+                  <tr>
+                    <td><code>full_content</code></td>
+                    <td>Seluruh percakapan dengan Claude</td>
+                    <td>⚠️ Hanya jika disetujui admin</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT STEP 3 -->
+    <div class="section" id="client-db">
+      <div class="section-header">
+        <div class="section-badge cyan">🗄️</div>
+        <div>
+          <h2>3. Setup Database Lokal (SQLite)</h2>
+          <div class="section-sub">Database lokal otomatis dibuat saat agent pertama kali jalan</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step client">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Database SQLite dibuat otomatis di <code style="font-family:monospace;font-size:13px">~/.ai-usage/local-tracker.db</code></div>
+            <div class="step-desc">Tidak perlu install PostgreSQL di komputer client. Jika ingin memastikan tabel sudah ada sebelum menjalankan agent, bisa jalankan perintah berikut (opsional):</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash — dari root folder project</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">node</span> <span class="flag">--input-type=module</span> <span class="s">&lt;&lt;'EOF'</span>
+<span class="k">import</span> Database <span class="k">from</span> <span class="s">'./node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3/lib/index.js'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> homedir <span class="p">}</span> <span class="k">from</span> <span class="s">'os'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> join <span class="p">}</span> <span class="k">from</span> <span class="s">'path'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> mkdirSync<span class="p">,</span> existsSync <span class="p">}</span> <span class="k">from</span> <span class="s">'fs'</span><span class="p">;</span>
+
+<span class="k">const</span> dir <span class="p">=</span> join(homedir(), <span class="s">'.ai-usage'</span>)<span class="p">;</span>
+<span class="k">if</span> (!existsSync(dir)) mkdirSync(dir, <span class="p">{</span> recursive: <span class="n">true</span> <span class="p">});</span>
+<span class="k">const</span> db <span class="p">=</span> <span class="k">new</span> Database(join(dir, <span class="s">'local-tracker.db'</span>))<span class="p">;</span>
+db.pragma(<span class="s">'journal_mode = WAL'</span>)<span class="p">;</span>
+db.pragma(<span class="s">'foreign_keys = ON'</span>)<span class="p">;</span>
+
+db.exec(<span class="s">`
+CREATE TABLE IF NOT EXISTS events (
+  id TEXT PRIMARY KEY, device_id TEXT NOT NULL, tool TEXT NOT NULL,
+  integration TEXT NOT NULL, integration_version TEXT, project_hash TEXT,
+  project_alias TEXT, session_id TEXT, message_id TEXT, timestamp TEXT NOT NULL,
+  started_at TEXT, ended_at TEXT, duration_ms INTEGER, provider TEXT, model TEXT,
+  input_tokens INTEGER, output_tokens INTEGER, total_tokens INTEGER,
+  token_count_status TEXT NOT NULL, pricing_rule_id TEXT, estimated_cost_usd REAL,
+  event_type TEXT NOT NULL, sync_mode TEXT NOT NULL, metadata TEXT,
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sync_queue (
+  event_id TEXT PRIMARY KEY REFERENCES events(id), status TEXT NOT NULL,
+  retry_count INTEGER NOT NULL DEFAULT 0, next_retry_at TEXT,
+  last_attempt_at TEXT, last_error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS projects (hash TEXT PRIMARY KEY, alias TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, project_hash TEXT, start_time TEXT NOT NULL, end_time TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS devices (id TEXT PRIMARY KEY, name TEXT NOT NULL, hostname TEXT NOT NULL, os TEXT NOT NULL, arch TEXT NOT NULL, tracker_version TEXT NOT NULL, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS pricing_rules (id TEXT PRIMARY KEY, provider TEXT NOT NULL, model TEXT NOT NULL, input_price_per_1m_tokens REAL NOT NULL, output_price_per_1m_tokens REAL NOT NULL, currency TEXT NOT NULL DEFAULT 'USD', effective_from TEXT NOT NULL, effective_to TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+`</span>)<span class="p">;</span>
+
+db.close()<span class="p">;</span>
+console.log(<span class="s">'✅ Database lokal siap di ~/.ai-usage/local-tracker.db'</span>)<span class="p">;</span>
+<span class="s">EOF</span></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT STEP 4 -->
+    <div class="section" id="client-run">
+      <div class="section-header">
+        <div class="section-badge cyan">▶️</div>
+        <div>
+          <h2>4. Jalankan Local Agent</h2>
+          <div class="section-sub">Agent yang memantau aktivitas Claude dan mengirim data ke admin</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step client">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Buat file <code style="font-family:monospace;font-size:13px">packages/local-agent/.env</code></div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">packages/local-agent/.env</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="v">PORT</span><span class="p">=</span><span class="n">3002</span>
+<span class="v">ADMIN_API_URL</span><span class="p">=</span><span class="s">http://IP-SERVER-ADMIN:4000</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Jalankan local-agent</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">cd</span> packages/local-agent
+<span class="dollar">$ </span><span class="cmd">pnpm</span> run dev</pre></div>
+            </div>
+            <div class="callout success" style="margin-top:8px">
+              <span class="callout-icon">✅</span>
+              <div class="callout-text">Output yang benar:
+                <br/><code style="font-family:monospace">Starting local-agent daemon polling...</code>
+                <br/><code style="font-family:monospace">Local Agent running on http://localhost:3002</code>
+                <br/><code style="font-family:monospace">[Daemon] Synced N events from Claude Code CLI</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Agar agent berjalan terus (background) — pakai PM2</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="dollar">$ </span><span class="cmd">npm</span> install <span class="flag">-g</span> pm2
+
+<span class="c"># Dari root folder project:</span>
+<span class="dollar">$ </span><span class="cmd">pm2</span> start pnpm <span class="flag">--name</span> <span class="s">"local-agent"</span> <span class="flag">--cwd</span> <span class="path">packages/local-agent</span> <span class="flag">--</span> run dev
+<span class="dollar">$ </span><span class="cmd">pm2</span> save
+<span class="dollar">$ </span><span class="cmd">pm2</span> startup</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">(Opsional) Jalankan Local Dashboard untuk lihat stat pribadi</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="c"># Buat apps/local-dashboard/.env</span>
+<span class="v">NEXT_PUBLIC_LOCAL_AGENT_URL</span><span class="p">=</span><span class="s">http://localhost:3002</span>
+
+<span class="c"># Jalankan:</span>
+<span class="dollar">$ </span><span class="cmd">cd</span> apps/local-dashboard
+<span class="dollar">$ </span><span class="cmd">pnpm</span> run dev   <span class="c"># buka http://localhost:3001</span></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT STEP 5 -->
+    <div class="section" id="client-verify">
+      <div class="section-header">
+        <div class="section-badge cyan">✅</div>
+        <div>
+          <h2>5. Verifikasi Sync Berhasil</h2>
+          <div class="section-sub">Cara memastikan data sudah terkirim ke server admin</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step client">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Cek log local-agent</div>
+            <div class="step-desc">Tunggu ~30 detik setelah agent pertama kali jalan, lalu perhatikan log:</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">output yang benar</span>
+              </div>
+              <div class="code-body"><pre><span class="c">✅ BERHASIL:</span>
+<span class="green">[SyncEngine] Successfully synced 8 events to Admin API.</span>
+
+<span class="c">❌ MASIH GAGAL — cek credential:</span>
+<span class="red">Sync error: Error: Sync failed with status 403</span>
+<span class="c">→ Berarti api_key tidak cocok. Hubungi admin untuk cek ulang.</span>
+
+<span class="c">❌ SERVER TIDAK BISA DIJANGKAU:</span>
+<span class="red">Sync error: Error: fetch failed</span>
+<span class="c">→ Berarti sync_endpoint salah atau server admin tidak berjalan.</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step client">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Cek via curl (opsional)</div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="code-copy" onclick="copy(this)">copy</button>
+              </div>
+              <div class="code-body"><pre><span class="c"># Test koneksi ke admin-api:</span>
+<span class="dollar">$ </span><span class="cmd">curl</span> http://IP-SERVER-ADMIN:4000/api/health
+<span class="c">→ harus return: {"status":"ok","version":"1.0.0"}</span>
+
+<span class="c"># Test auth dengan api_key:</span>
+<span class="dollar">$ </span><span class="cmd">curl</span> <span class="flag">-X</span> POST http://IP-SERVER-ADMIN:4000/api/sync/batch \
+  <span class="flag">-H</span> <span class="s">"Content-Type: application/json"</span> \
+  <span class="flag">-H</span> <span class="s">"Authorization: Bearer API-KEY-KAMU"</span> \
+  <span class="flag">-d</span> <span class="s">'{"events":[]}'</span>
+<span class="c">→ harus return: {"accepted":0,"duplicates":0,"failed":[],...}</span></pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="step green">
+          <div class="step-number">✓</div>
+          <div class="step-content">
+            <div class="step-title">Setup selesai! Admin bisa melihat data kamu di dashboard</div>
+            <div class="callout success">
+              <span class="callout-icon">🎉</span>
+              <div class="callout-text">Data penggunaan Claude kamu sekarang ter-sync ke admin dashboard setiap 30 detik. Admin bisa membuka <strong>http://localhost:3000</strong> (atau URL server admin) untuk melihat statistik.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ALUR SINKRONISASI -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge green">🔄</div>
+        <div>
+          <h2>Alur Sinkronisasi Data</h2>
+          <div class="section-sub">Bagaimana data mengalir dari Claude di komputermu ke admin dashboard</div>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="flow-item">
+          <div class="flow-left">
+            <div class="flow-dot cyan"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-text">
+            <div class="ft-title">Kamu pakai Claude Code CLI</div>
+            <div class="ft-desc">Claude otomatis menulis log session ke <code style="font-family:monospace;font-size:11px">~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code></div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-left">
+            <div class="flow-dot cyan"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-text">
+            <div class="ft-title">Local Agent membaca log (setiap 5 detik)</div>
+            <div class="ft-desc">Daemon membaca file .jsonl, mengekstrak token usage, model, timestamp, dan menyimpan ke SQLite lokal di <code style="font-family:monospace;font-size:11px">~/.ai-usage/local-tracker.db</code></div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-left">
+            <div class="flow-dot cyan"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-text">
+            <div class="ft-title">Sync Engine mengirim batch ke admin (setiap 30 detik)</div>
+            <div class="ft-desc">Mengambil max 100 events dari sync queue dengan status "pending", mengirim ke <code style="font-family:monospace;font-size:11px">POST /api/sync/batch</code> dengan Bearer token</div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-left">
+            <div class="flow-dot orange"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-text">
+            <div class="ft-title">Admin API memvalidasi dan menyimpan</div>
+            <div class="ft-desc">Memeriksa API key, menyimpan events ke PostgreSQL, mencatat sync log. Mengembalikan <code style="font-family:monospace;font-size:11px">{"accepted": N}</code></div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-left">
+            <div class="flow-dot orange"></div>
+            <div class="flow-line" style="min-height:0"></div>
+          </div>
+          <div class="flow-text">
+            <div class="ft-title">Admin Dashboard menampilkan statistik</div>
+            <div class="ft-desc">Refresh otomatis setiap 5 detik. Menampilkan total token, biaya estimasi, grafik per-hari, dan breakdown per model dari semua client</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- PORTS TABLE -->
+    <div class="section" id="ports">
+      <div class="section-header">
+        <div class="section-badge purple">🔌</div>
+        <div>
+          <h2>Daftar Port & URL</h2>
+          <div class="section-sub">Semua service dan port yang digunakan</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Port</th>
+            <th>Pihak</th>
+            <th>URL Default</th>
+            <th>Fungsi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>admin-api</code></td>
+            <td><code>4000</code></td>
+            <td><span class="tag admin">Admin</span></td>
+            <td><code>http://server:4000</code></td>
+            <td>Menerima sync dari client</td>
+          </tr>
+          <tr>
+            <td><code>admin-dashboard</code></td>
+            <td><code>3000</code></td>
+            <td><span class="tag admin">Admin</span></td>
+            <td><code>http://server:3000</code></td>
+            <td>Dashboard statistik semua client</td>
+          </tr>
+          <tr>
+            <td><code>local-agent</code></td>
+            <td><code>3002</code></td>
+            <td><span class="tag client">Client</span></td>
+            <td><code>http://localhost:3002</code></td>
+            <td>API lokal agent, endpoint events</td>
+          </tr>
+          <tr>
+            <td><code>local-dashboard</code></td>
+            <td><code>3001</code></td>
+            <td><span class="tag client">Client</span></td>
+            <td><code>http://localhost:3001</code></td>
+            <td>Dashboard statistik pribadi (opsional)</td>
+          </tr>
+          <tr>
+            <td><code>PostgreSQL</code></td>
+            <td><code>5433</code></td>
+            <td><span class="tag admin">Admin</span></td>
+            <td><code>VPS</code></td>
+            <td>Database terpusat</td>
+          </tr>
+          <tr>
+            <td><code>SQLite</code></td>
+            <td>—</td>
+            <td><span class="tag client">Client</span></td>
+            <td><code>~/.ai-usage/local-tracker.db</code></td>
+            <td>Database lokal (file)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn" style="margin-top:12px">
+        <span class="callout-icon">🔥</span>
+        <div class="callout-text">
+          <strong>Firewall:</strong> Pastikan port <code style="font-family:monospace">4000</code> di server admin terbuka dan bisa diakses dari IP komputer client. Port lain cukup local.
+        </div>
+      </div>
+    </div>
+
+    <!-- SYNC MODES -->
+    <div class="section" id="sync-modes">
+      <div class="section-header">
+        <div class="section-badge purple">🔒</div>
+        <div>
+          <h2>Sync Mode — Kontrol Privasi</h2>
+          <div class="section-sub">Kontrol seberapa banyak data yang dikirim ke admin</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Data Dikirim</th>
+            <th>Kelebihan</th>
+            <th>Kekurangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>metadata_only</code></td>
+            <td>Token count, model, timestamp, project hash</td>
+            <td>✅ Privasi terjaga, payload kecil</td>
+            <td>Admin tidak bisa lihat konteks percakapan</td>
+          </tr>
+          <tr>
+            <td><code>redacted_content</code></td>
+            <td>Isi chat dengan data sensitif tersensor</td>
+            <td>Balance antara privasi dan transparansi</td>
+            <td>⚠️ Fitur masih dalam pengembangan</td>
+          </tr>
+          <tr>
+            <td><code>full_content</code></td>
+            <td>Semua percakapan lengkap dengan Claude</td>
+            <td>Admin bisa audit penggunaan AI detail</td>
+            <td>⚠️ Privasi rendah — gunakan hanya jika ada policy khusus</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="section" id="troubleshoot">
+      <div class="section-header">
+        <div class="section-badge purple">🛠️</div>
+        <div>
+          <h2>Troubleshooting</h2>
+          <div class="section-sub">Solusi untuk masalah umum</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">!</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--red)">Error: Sync failed with status 403</div>
+            <div class="step-desc">API key tidak cocok atau device belum terdaftar di database admin.</div>
+            <ul class="checklist">
+              <li><span class="check-icon">→</span><span>Cek isi <code style="font-family:monospace">api_key</code> di <code style="font-family:monospace">~/.ai-usage/config.json</code> — harus sama persis dengan yang di-input saat registrasi</span></li>
+              <li><span class="check-icon">→</span><span>Admin: cek tabel <code style="font-family:monospace">devices</code> di PostgreSQL — pastikan <code style="font-family:monospace">api_key_hash</code> terdaftar</span></li>
+              <li><span class="check-icon">→</span><span>Restart local-agent setelah memperbaiki config</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">!</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--red)">Error: ECONNREFUSED / fetch failed</div>
+            <div class="step-desc">Tidak bisa terhubung ke admin-api.</div>
+            <ul class="checklist">
+              <li><span class="check-icon">→</span><span>Pastikan admin-api sedang berjalan di server</span></li>
+              <li><span class="check-icon">→</span><span>Cek <code style="font-family:monospace">sync_endpoint</code> di config — gunakan IP publik server, bukan <code style="font-family:monospace">localhost</code></span></li>
+              <li><span class="check-icon">→</span><span>Cek firewall: port 4000 harus terbuka</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">!</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--red)">Events tidak muncul di dashboard admin</div>
+            <ul class="checklist">
+              <li><span class="check-icon">→</span><span>Tunggu minimal 30-60 detik untuk sync cycle pertama</span></li>
+              <li><span class="check-icon">→</span><span>Cek log local-agent — harus ada baris <code style="font-family:monospace">[SyncEngine] Successfully synced N events</code></span></li>
+              <li><span class="check-icon">→</span><span>Jika stuck di "sending" — restart local-agent (on-start auto-recover events stuck di status sending)</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">!</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--red)">Dashboard menampilkan 0 data</div>
+            <ul class="checklist">
+              <li><span class="check-icon">→</span><span>Pastikan Claude Code CLI pernah digunakan — log ada di <code style="font-family:monospace">~/.claude/projects/</code></span></li>
+              <li><span class="check-icon">→</span><span>Ganti time range di dashboard dari "Today" ke "All"</span></li>
+              <li><span class="check-icon">→</span><span>Cek <code style="font-family:monospace">DATABASE_URL</code> di dashboard mengarah ke database yang benar</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">!</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--red)">pnpm install error: Invalid package manager specification</div>
+            <ul class="checklist">
+              <li><span class="check-icon">→</span><span>Edit <code style="font-family:monospace">package.json</code> di root: ubah <code style="font-family:monospace">"version": "^11.5.3"</code> → <code style="font-family:monospace">"version": "11.5.3"</code></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="page-footer">
+      <span>AI Monitoring System — Setup Guide v1.0 · 2026</span>
+      <span>Built with Hono · Next.js · Drizzle ORM · pnpm</span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ─── COPY BUTTON ───
+  function copy(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText
+      .replace(/^\$ /gm, '')          // hapus prompt $
+      .trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'copied!';
+      btn.style.color = '#86EFAC';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+    });
+  }
+
+  // ─── ACTIVE NAV ON SCROLL ───
+  const sections = document.querySelectorAll('[id]');
+  const navItems = document.querySelectorAll('.nav-item[href]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
