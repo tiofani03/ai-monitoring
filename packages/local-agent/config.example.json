@@ -1,0 +1,9 @@
+{
+  "device_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+  "device_name": "My-MacBook-Pro",
+  "sync_endpoint": "http://localhost:4000",
+  "api_key": "your-secret-api-key-here",
+  "sync_mode": "metadata_only",
+  "database_path": "sqlite.db",
+  "debug": false
+}

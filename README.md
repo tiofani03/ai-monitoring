@@ -82,9 +82,10 @@ Setiap user perlu menginstall dan menjalankan aplikasi *agent* di perangkat masi
    Ini adalah script yang harus berjalan di *background* untuk membaca log AI.
    ```bash
    cd ../../packages/local-agent
-   # local-agent menggunakan file ~/.ai-usage/config.json untuk konfigurasi server Admin.
-   # Jalankan sekali agar file config.json terbuat, lalu edit isinya:
-   # Tambahkan "sync_endpoint": "http://<IP_SERVER_ADMIN>:4000"
+   # local-agent menggunakan file ~/.ai-usage/config.json untuk konfigurasi.
+   # Jika belum ada, Anda bisa menyalin format dari file config.example.json:
+   # cp config.example.json ~/.ai-usage/config.json
+   # Edit ~/.ai-usage/config.json dan pastikan "sync_endpoint" terisi dengan benar.
    pnpm run dev
    # Saran: gunakan PM2 (pm2 start src/index.ts) atau buat service sistem agar berjalan terus.
    ```
