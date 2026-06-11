@@ -36,7 +36,8 @@ Sebagai admin, Anda bertanggung jawab untuk menjalankan API Sentral dan Dashboar
    Masuk ke folder `db-admin` dan lakukan migrasi skema database.
    ```bash
    cd packages/db-admin
-   # Buat file .env dengan konfigurasi koneksi DB (misal: PostgreSQL URL)
+   # Copy environment file dan sesuaikan konfigurasi koneksi DB (misal: PostgreSQL URL)
+   cp .env.example .env
    # Jalankan perintah migrasi Drizzle
    pnpm run db:push
    ```
@@ -44,13 +45,15 @@ Sebagai admin, Anda bertanggung jawab untuk menjalankan API Sentral dan Dashboar
    Jalankan backend yang menerima *sync* data.
    ```bash
    cd ../../apps/admin-api
-   # Setup .env (Contoh: PORT=3001, DATABASE_URL)
+   # Copy environment file dan sesuaikan (Contoh: PORT=4000, DATABASE_URL)
+   cp .env.example .env
    pnpm run dev
    ```
 4. **Jalankan Admin Dashboard:**
    ```bash
    cd ../admin-dashboard
-   # Pastikan mengarah ke port admin-api di file konfigurasi / .env
+   # Copy environment file dan pastikan mengarah ke port admin-api
+   cp .env.example .env
    pnpm run dev
    ```
 
@@ -72,13 +75,15 @@ Setiap user perlu menginstall dan menjalankan aplikasi *agent* di perangkat masi
    User menggunakan SQLite secara lokal untuk menyimpan sementara.
    ```bash
    cd packages/db-local
+   cp .env.example .env
    pnpm run db:push
    ```
 3. **Jalankan Local Agent:**
    Ini adalah script yang harus berjalan di *background* untuk membaca log AI.
    ```bash
    cd ../../packages/local-agent
-   # Wajib setup .env: ADMIN_API_URL=http://<IP_SERVER_ADMIN>:3001
+   # Copy environment file dan wajib setup ADMIN_API_URL=http://<IP_SERVER_ADMIN>:4000
+   cp .env.example .env
    pnpm run dev
    # Saran: gunakan PM2 (pm2 start src/index.ts) atau buat service sistem agar berjalan terus.
    ```
@@ -86,6 +91,7 @@ Setiap user perlu menginstall dan menjalankan aplikasi *agent* di perangkat masi
    Jika user ingin mengecek penggunaannya sendiri melalui tampilan web:
    ```bash
    cd ../../apps/local-dashboard
+   cp .env.example .env
    pnpm run dev
    ```
 
