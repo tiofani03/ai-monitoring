@@ -1,0 +1,24 @@
+{
+  "name": "admin-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@ai-monitoring/db-admin": "workspace:*",
+    "@ai-monitoring/shared": "workspace:*",
+    "@hono/node-server": "^1.12.0",
+    "drizzle-orm": "^0.33.0",
+    "hono": "^4.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.16.2"
+  }
+}
